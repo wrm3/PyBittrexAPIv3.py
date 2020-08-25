@@ -258,21 +258,22 @@ class Bittrex3(object):
 		r =  requests.get(request_url, headers={"apisign": apisign}, timeout=10)
 
 		resp = {}
+		resp["success"]     = True
+		resp["message"]     = "''"
+		resp["result"]      = {}
+		resp["status_code"] = r.status_code
 		if r.status_code in (200,201,202,204):
 			resp["success"] = True
 		else:
 			resp["success"] = False
 
-		resp["message"] = "''"
-
 		try:
 			data = r.json()
+			resp["result"] = data
 		except Exception:
 			print(r)
+			print(Exception)
 			exit()
-
-		resp["result"] = data
-		resp["status_code"] = r.status_code
 
 		return resp
 
@@ -363,10 +364,12 @@ class Bittrex3(object):
 #		text					Returns the content of the response, in unicode
 #		url						Returns the URL of the response
 
-#		print(r)
-#		print('status_code : ' + str(r.status_code))
-
 		resp = {}
+		resp["success"]     = True
+		resp["message"]     = "''"
+		resp["result"]      = {}
+		resp["status_code"] = r.status_code
+
 		if r.status_code in (200,201,202,204):
 #			if r.status_code ==200: print('200 - OK')
 #			if r.status_code ==201: print('201 - Created')
@@ -394,14 +397,31 @@ class Bittrex3(object):
 			resp["success"] = False
 #			print(r)
 
-		resp["message"] = "''"
-
-		data = r.json()
-
-		resp["result"] = data
-		resp["status_code"] = r.status_code
+		try:
+			data = r.json()
+			resp["result"] = data
+		except Exception:
+			print(r)
+			print(Exception)
+			exit()
 
 		return resp
+
+
+#	HTTP Status Codes
+#	Status Code	Description
+#	200 (OK)
+#	201 (Created)
+#	202 (Accepted)
+#	204 (No Content)
+#	400 - Bad Request			The request was malformed, often due to a missing or invalid parameter. See the error code and response data for more details.
+#	401 - Unauthorized			The request failed to authenticate (example: a valid api key was not included in your request header)
+#	403 - Forbidden				The provided api key is not authorized to perform the requested operation (example: attempting to trade with an api key not authorized to make trades)
+#	404 - Not Found				The requested resource does not exist.
+#	409 - Conflict				The request parameters were valid but the request failed due to an operational error. (example: INSUFFICIENT_FUNDS)
+#	429 - Too Many Requests		Too many requests hit the API too quickly. Please make sure to implement exponential backoff with your requests.
+#	501 - Not Implemented		The service requested has not yet been implemented.
+#	503 - Service Unavailable	The request parameters were valid but the request failed because the resource is temporarily unavailable (example: CURRENCY_OFFLINE)
 
 
 #<=====>#
